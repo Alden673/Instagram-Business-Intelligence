@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: instagram
+    description: Instagram analytics and AI marketing assistant
 paths:
   /healthz:
     get:
@@ -24,6 +26,96 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /instagram/demo:
+    post:
+      operationId: loadInstagramDemo
+      tags: [instagram]
+      summary: Load the built-in Instagram demo account
+      responses:
+        "200":
+          description: Demo analytics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstagramAnalysis"
+  /instagram/analyze:
+    post:
+      operationId: analyzeInstagramData
+      tags: [instagram]
+      summary: Analyze uploaded Instagram CSV or JSON data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InstagramDataInput"
+      responses:
+        "200":
+          description: Analytics snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstagramAnalysis"
+        "400":
+          description: Invalid analytics data
+  /instagram/chat:
+    post:
+      operationId: askInstagramAgent
+      tags: [instagram]
+      summary: Ask the Instagram marketing agent a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentQuestionInput"
+      responses:
+        "200":
+          description: Agent answer with visible activity steps
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentResponse"
+  /instagram/recommendations:
+    post:
+      operationId: getInstagramRecommendations
+      tags: [instagram]
+      summary: Generate evidence-based recommendations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecommendationInput"
+      responses:
+        "200":
+          description: Personalized recommendations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Recommendation"
+  /instagram/content-plan:
+    post:
+      operationId: generateInstagramContentPlan
+      tags: [instagram]
+      summary: Generate a seven-day content plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContentPlanInput"
+      responses:
+        "200":
+          description: Seven-day content plan
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentPlanDay"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +125,119 @@ components:
           type: string
       required:
         - status
+    InstagramPost:
+      type: object
+      required: [id, date, caption, contentType, reach, likes, comments, saves, shares, engagementRate]
+      properties:
+        id: { type: string }
+        date: { type: string }
+        caption: { type: string }
+        contentType: { type: string, enum: [Reel, Carousel, Image, Story] }
+        reach: { type: number }
+        likes: { type: number }
+        comments: { type: number }
+        saves: { type: number }
+        shares: { type: number }
+        engagementRate: { type: number }
+    InstagramDataInput:
+      type: object
+      required: [posts]
+      properties:
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstagramPost"
+    InstagramMetric:
+      type: object
+      required: [label, value, change, trend]
+      properties:
+        label: { type: string }
+        value: { type: string }
+        change: { type: string }
+        trend: { type: string, enum: [up, down, neutral] }
+    ContentTypePerformance:
+      type: object
+      required: [type, posts, reach, engagement, engagementRate]
+      properties:
+        type: { type: string }
+        posts: { type: number }
+        reach: { type: number }
+        engagement: { type: number }
+        engagementRate: { type: number }
+    TrendPoint:
+      type: object
+      required: [label, reach, engagement]
+      properties:
+        label: { type: string }
+        reach: { type: number }
+        engagement: { type: number }
+    InstagramAnalysis:
+      type: object
+      required: [accountName, period, metrics, posts, topPosts, underperformingPosts, contentTypes, trends]
+      properties:
+        accountName: { type: string }
+        period: { type: string }
+        metrics:
+          type: array
+          items: { $ref: "#/components/schemas/InstagramMetric" }
+        posts:
+          type: array
+          items: { $ref: "#/components/schemas/InstagramPost" }
+        topPosts:
+          type: array
+          items: { $ref: "#/components/schemas/InstagramPost" }
+        underperformingPosts:
+          type: array
+          items: { $ref: "#/components/schemas/InstagramPost" }
+        contentTypes:
+          type: array
+          items: { $ref: "#/components/schemas/ContentTypePerformance" }
+        trends:
+          type: array
+          items: { $ref: "#/components/schemas/TrendPoint" }
+    AgentQuestionInput:
+      type: object
+      required: [question, analysis]
+      properties:
+        question: { type: string, minLength: 1 }
+        analysis: { $ref: "#/components/schemas/InstagramAnalysis" }
+    AgentResponse:
+      type: object
+      required: [answer, tools, citations]
+      properties:
+        answer: { type: string }
+        tools:
+          type: array
+          items: { type: string }
+        citations:
+          type: array
+          items: { type: string }
+    RecommendationInput:
+      type: object
+      required: [analysis]
+      properties:
+        analysis: { $ref: "#/components/schemas/InstagramAnalysis" }
+    Recommendation:
+      type: object
+      required: [title, description, evidence, priority, type]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        evidence: { type: string }
+        priority: { type: string, enum: [High, Medium, Low] }
+        type: { type: string }
+    ContentPlanInput:
+      type: object
+      required: [analysis]
+      properties:
+        analysis: { $ref: "#/components/schemas/InstagramAnalysis" }
+    ContentPlanDay:
+      type: object
+      required: [day, format, topic, hook, goal]
+      properties:
+        day: { type: string }
+        format: { type: string }
+        topic: { type: string }
+        hook: { type: string }
+        goal: { type: string }
 

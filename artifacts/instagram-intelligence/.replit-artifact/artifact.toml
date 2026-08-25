@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Instagram Business Intelligence"
+description = "A customer-facing AI marketing assistant for small businesses that turns Instagram analytics uploads into actionable performance insights, recommendations, and a seven-day content plan."
+version = "1.0.0"
+id = "artifacts/instagram-intelligence"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25936
+
+[services.development]
+run = "pnpm --filter @workspace/instagram-intelligence run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/instagram-intelligence", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/instagram-intelligence/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25936"
+BASE_PATH = "/"
