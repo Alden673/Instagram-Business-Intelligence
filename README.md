@@ -367,7 +367,7 @@ This makes it possible to:
                                ▼
                     ┌─────────────────────┐
                     │    Backend API      │
-                    │ Node.js / Fastify   │
+                    │ Node.js / Express   │
                     └──────────┬──────────┘
                                │
                  ┌─────────────┴─────────────┐
