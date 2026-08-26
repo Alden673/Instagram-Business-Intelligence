@@ -1,1 +1,0 @@
-- [Instagram intelligence architecture](instagram-intelligence.md) — keep account-derived facts separate from strategy context and expose tool activity without private reasoning.
