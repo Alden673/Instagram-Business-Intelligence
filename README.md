@@ -68,7 +68,7 @@ The AI agent uses the available Instagram data and the project's content strateg
 
 - Node.js
 - TypeScript
-- Fastify
+- Express
 - REST API
 
 ### AI
